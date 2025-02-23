@@ -1,4 +1,4 @@
-import FlexInput from "@/components/FlexInput";
+import Chart from "@/components/Chart";
 
 export default function Home() {
   return (
@@ -7,9 +7,7 @@ export default function Home() {
         <h1 className="text-2xl">Cordal🪸</h1>
       </header>
       <main className="text-center">
-        <h1 className="text-4xl">
-          <FlexInput placeholder="Chart Name" />
-        </h1>
+        <Chart />
       </main>
       <footer></footer>
     </>
