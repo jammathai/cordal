@@ -20,12 +20,5 @@ export default function FlexInput(props: React.ComponentProps<"input">) {
     inputRef.current!.dispatchEvent(new Event("input", { bubbles: true }));
   }, []);
 
-  return (
-    <input
-      ref={inputRef}
-      className="w-0 p-1 rounded-md bg-transparent placeholder-placeholder"
-      onInput={resize}
-      {...props}
-    />
-  );
+  return <input ref={inputRef} onInput={resize} {...props} />;
 }
