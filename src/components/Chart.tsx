@@ -7,9 +7,11 @@ import Chord from "./Chord";
 export default function Chart() {
   const [chords, setChords] = useState<string[]>([""]);
 
+  const scales = chords.map((value) => value);
+
   return (
     <>
-      <h1 className="text-4xl mb-4">
+      <h1 className="text-4xl mb-2">
         <FlexInput
           className="w-0 p-1 rounded-md bg-transparent placeholder-placeholder"
           placeholder="Chart Name"
@@ -19,6 +21,7 @@ export default function Chart() {
         {chords.slice(0, -1).map((chord, i) => (
           <Chord
             defaultValue={chord}
+            scale={scales[i]}
             setValue={(value: string) => {
               setChords(chords.map((_, j) => (j === i ? value : chords[j])));
             }}
@@ -27,6 +30,7 @@ export default function Chart() {
         ))}
         <Chord
           defaultValue={chords[chords.length - 1]}
+          scale={scales[scales.length - 1]}
           setValue={(value: string) => {
             setChords(
               chords.map((_, i) =>
@@ -44,7 +48,7 @@ export default function Chart() {
             } else if (
               e.key === "Backspace" &&
               input.value === "" &&
-              chords.length > 0
+              chords.length > 1
             ) {
               e.preventDefault();
               input.value = chords[chords.length - 2];
