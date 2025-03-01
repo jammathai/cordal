@@ -1,6 +1,6 @@
 import FlexInput from "./FlexInput";
 
-export default function Chord({
+export default function ChordInput({
   defaultValue,
   scale,
   setValue,
@@ -23,6 +23,13 @@ export default function Chord({
         placeholder="%"
         onChange={(e) => {
           setValue(e.target.value);
+        }}
+        onInput={(e) => {
+          const input = e.target as HTMLInputElement;
+          input.value = input.value
+            .replace("#", "♯")
+            .replace("b", "♭")
+            .replace("M", "Δ");
         }}
         {...props}
       />

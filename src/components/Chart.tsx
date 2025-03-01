@@ -2,12 +2,16 @@
 
 import { useState } from "react";
 import FlexInput from "./FlexInput";
-import Chord from "./Chord";
+import ChordInput from "./ChordInput";
+import Chord from "@/models/Chord";
 
 export default function Chart() {
-  const [chords, setChords] = useState<string[]>([""]);
+  const [chords, setChords] = useState<Chord[]>([new Chord()]);
 
-  const scales = chords.map((value) => value);
+  function setChord(index: number, value: string) {
+    chords[index].setName(value);
+    setChords(chords);
+  }
 
   return (
     <>
@@ -19,24 +23,20 @@ export default function Chart() {
       </h1>
       <div className="m-auto max-w-2xl grid grid-cols-4 text-left text-2xl">
         {chords.slice(0, -1).map((chord, i) => (
-          <Chord
-            defaultValue={chord}
-            scale={scales[i]}
-            setValue={(value: string) => {
-              setChords(chords.map((_, j) => (j === i ? value : chords[j])));
+          <ChordInput
+            defaultValue={chord.name}
+            scale={chord.scale}
+            setValue={(name: string) => {
+              setChord(i, name);
             }}
             key={i}
           />
         ))}
-        <Chord
-          defaultValue={chords[chords.length - 1]}
-          scale={scales[scales.length - 1]}
+        <ChordInput
+          defaultValue={chords[chords.length - 1].name}
+          scale={chords[chords.length - 1].scale}
           setValue={(value: string) => {
-            setChords(
-              chords.map((_, i) =>
-                i === chords.length - 1 ? value : chords[i]
-              )
-            );
+            setChord(chords.length - 1, value);
           }}
           onKeyDown={(e) => {
             const input = e.target as HTMLInputElement;
@@ -44,14 +44,14 @@ export default function Chart() {
               e.preventDefault();
               input.value = "";
               input.dispatchEvent(new Event("input", { bubbles: true }));
-              setChords([...chords, ""]);
+              setChords([...chords, new Chord()]);
             } else if (
               e.key === "Backspace" &&
               input.value === "" &&
               chords.length > 1
             ) {
               e.preventDefault();
-              input.value = chords[chords.length - 2];
+              input.value = chords[chords.length - 2].name;
               input.dispatchEvent(new Event("input", { bubbles: true }));
               setChords(chords.slice(0, -1));
             }
