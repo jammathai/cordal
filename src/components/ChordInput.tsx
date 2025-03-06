@@ -1,21 +1,22 @@
+import Scale from "@/models/Scale";
 import FlexInput from "./FlexInput";
 
 export default function ChordInput({
   defaultValue,
-  scale,
+  scales,
   setValue,
   ...props
 }: Readonly<
   {
     defaultValue: string;
-    scale: string;
+    scales: Scale[];
     setValue: (value: string) => void;
   } & React.ComponentProps<typeof FlexInput>
 >) {
   return (
     <div>
-      <div className="mt-2 mb-1 pl-1 h-7 text-primary text-lg border-primary border-b-2">
-        {scale}
+      <div className="mt-2 mb-1 pl-1 h-12 text-primary text-xs border-primary border-b-2">
+        {scales.map((scale) => scale.name).join(" | ")}
       </div>
       <FlexInput
         className="w-0 p-1 rounded-md bg-transparent placeholder-placeholder"
@@ -26,10 +27,7 @@ export default function ChordInput({
         }}
         onInput={(e) => {
           const input = e.target as HTMLInputElement;
-          input.value = input.value
-            .replace("#", "♯")
-            .replace("b", "♭")
-            .replace("M", "Δ");
+          input.value = input.value.replace("#", "♯").replace("b", "♭");
         }}
         {...props}
       />

@@ -1,73 +1,53 @@
-const NOTES: { [token: string]: number } = {
-  C: 0,
-  "C♯": 1,
-  "D♭": 1,
-  D: 2,
-  "D♯": 3,
-  "E♭": 3,
-  E: 4,
-  F: 5,
-  "F♯": 6,
-  "G♭": 6,
-  G: 7,
-  "G♯": 8,
-  "A♭": 8,
-  A: 9,
-  "A♯": 10,
-  "B♭": 10,
-  B: 11,
-};
-
-const EXTENSIONS: { [token: string]: { [degree: number]: number } } = {
-  "6": { 6: 9 },
-  "7": { 7: 10 },
-  "9": { 7: 10, 9: 2 },
-  "11": { 7: 10, 9: 2, 11: 5 },
-  "13": { 7: 10, 9: 2, 11: 5, 13: 9 },
-  Δ7: { 7: 11 },
-  Δ9: { 7: 11, 9: 2 },
-  Δ11: { 7: 11, 9: 2, 11: 5 },
-  Δ13: { 7: 11, 9: 2, 11: 5, 13: 9 },
-};
-
-const ALTERATIONS: { [token: string]: { degree: number; note: number } } = {
-  "♭5": { degree: 5, note: 6 },
-  "♯5": { degree: 5, note: 8 },
-  "♭9": { degree: 9, note: 1 },
-  "♯9": { degree: 9, note: 3 },
-  "♭11": { degree: 11, note: 4 },
-  "♯11": { degree: 11, note: 6 },
-  "♭13": { degree: 13, note: 8 },
-  "♯13": { degree: 13, note: 10 },
-};
-
-function parseToken<T>(
-  src: string,
-  tokens: { [token: string]: T }
-): [T | undefined, string] {
-  for (const name in tokens)
-    if (src.startsWith(name)) return [tokens[name], src.slice(name.length)];
-  return [undefined, src];
-}
+import Note from "./Note";
 
 export default class Chord {
+  static extensions: { [token: string]: { [degree: number]: number } } = {
+    "6": { 6: 9 },
+    "7": { 7: 10 },
+    "9": { 7: 10, 9: 2 },
+    "11": { 7: 10, 9: 2, 11: 5 },
+    "13": { 7: 10, 9: 2, 11: 5, 13: 9 },
+    M7: { 7: 11 },
+    M9: { 7: 11, 9: 2 },
+    M11: { 7: 11, 9: 2, 11: 5 },
+    M13: { 7: 11, 9: 2, 11: 5, 13: 9 },
+  };
+
+  static alterations: { [token: string]: { degree: number; note: number } } = {
+    "♭5": { degree: 5, note: 6 },
+    "♯5": { degree: 5, note: 8 },
+    "♭9": { degree: 9, note: 1 },
+    "♯9": { degree: 9, note: 3 },
+    "♭11": { degree: 11, note: 4 },
+    "♯11": { degree: 11, note: 6 },
+    "♭13": { degree: 13, note: 8 },
+    "♯13": { degree: 13, note: 10 },
+  };
+
+  static parseToken<T>(
+    src: string,
+    tokens: { [token: string]: T }
+  ): [T | undefined, string] {
+    for (const name of Object.keys(tokens).sort((a, b) => b.length - a.length))
+      if (src.startsWith(name)) return [tokens[name], src.slice(name.length)];
+    return [undefined, src];
+  }
+
   name: string;
   notes: { [degree: number]: number | undefined };
-  scale: string;
 
   constructor() {
     this.name = "";
     this.notes = {};
-    this.scale = "";
   }
 
   setName(name: string) {
     this.name = name;
     this.notes = {};
 
-    [this.notes[1], name] = parseToken<number>(name, NOTES);
+    [this.notes[1], name] = Chord.parseToken<number>(name, Note.byName);
     if (this.notes[1] === undefined) {
-      console.error(`Malformed chord ${this.name}`);
+      console.error(`Malformed chord "${this.name}": invalid root`);
       return;
     }
 
@@ -81,9 +61,9 @@ export default class Chord {
     this.notes[5] = this.notes[1] + 7;
 
     let extensions;
-    [extensions, name] = parseToken<{ [degree: number]: number }>(
+    [extensions, name] = Chord.parseToken<{ [degree: number]: number }>(
       name,
-      EXTENSIONS
+      Chord.extensions
     );
     if (extensions !== undefined)
       for (const degree in extensions)
@@ -91,15 +71,19 @@ export default class Chord {
 
     let alteration;
     while (
-      ([alteration, name] = parseToken<{ degree: number; note: number }>(
+      ([alteration, name] = Chord.parseToken<{ degree: number; note: number }>(
         name,
-        ALTERATIONS
+        Chord.alterations
       ))[0] !== undefined
     )
       this.notes[alteration!.degree] = this.notes[1] + alteration!.note;
 
-    if (name !== "") console.error(`Malformed chord ${this.name}`);
+    for (let degree in this.notes)
+      if (this.notes[degree] !== undefined) this.notes[degree] %= 12;
 
-    console.log(this.notes);
+    if (name !== "")
+      console.error(
+        `Malformed chord "${this.name}": unrecognized string "${name}"`
+      );
   }
 }

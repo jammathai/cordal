@@ -1,17 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FlexInput from "./FlexInput";
 import ChordInput from "./ChordInput";
 import Chord from "@/models/Chord";
+import Scale from "@/models/Scale";
 
 export default function Chart() {
   const [chords, setChords] = useState<Chord[]>([new Chord()]);
+  const [scales, setScales] = useState<Scale[][]>([[]]);
 
-  function setChord(index: number, value: string) {
-    chords[index].setName(value);
-    setChords(chords);
-  }
+  useEffect(() => {
+    for (let i = 1; i < chords.length; i++)
+      if (chords[i].name === "") chords[i].notes = chords[i - 1].notes;
+    setScales(
+      chords.map((chord) =>
+        Scale.getAll().filter((scale) => scale.isParentScale(chord))
+      )
+    );
+  }, [chords]);
 
   return (
     <>
@@ -25,18 +32,20 @@ export default function Chart() {
         {chords.slice(0, -1).map((chord, i) => (
           <ChordInput
             defaultValue={chord.name}
-            scale={chord.scale}
+            scales={scales[i]}
             setValue={(name: string) => {
-              setChord(i, name);
+              chords[i].setName(name);
+              setChords([...chords]);
             }}
             key={i}
           />
         ))}
         <ChordInput
           defaultValue={chords[chords.length - 1].name}
-          scale={chords[chords.length - 1].scale}
-          setValue={(value: string) => {
-            setChord(chords.length - 1, value);
+          scales={scales[chords.length - 1]}
+          setValue={(name: string) => {
+            chords[chords.length - 1].setName(name);
+            setChords([...chords]);
           }}
           onKeyDown={(e) => {
             const input = e.target as HTMLInputElement;
@@ -45,6 +54,7 @@ export default function Chart() {
               input.value = "";
               input.dispatchEvent(new Event("input", { bubbles: true }));
               setChords([...chords, new Chord()]);
+              setScales([...scales, []]);
             } else if (
               e.key === "Backspace" &&
               input.value === "" &&
