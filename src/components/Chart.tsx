@@ -13,11 +13,46 @@ export default function Chart() {
   useEffect(() => {
     for (let i = 1; i < chords.length; i++)
       if (chords[i].name === "") chords[i].notes = chords[i - 1].notes;
-    setScales(
-      chords.map((chord) =>
-        Scale.getAll().filter((scale) => scale.isParentScale(chord))
-      )
+
+    const table = chords.map((_) => Scale.SCALES.map((_) => Infinity));
+    const backtrace: number[][][] = chords.map((_) =>
+      Scale.SCALES.map((_) => [])
     );
+
+    for (let j = 0; j < Scale.SCALES.length; j++)
+      if (Scale.SCALES[j].isParentScale(chords[0])) table[0][j] = 0;
+
+    for (let i = 1; i < chords.length; i++) {
+      for (let j = 0; j < Scale.SCALES.length; j++) {
+        if (!Scale.SCALES[j].isParentScale(chords[i])) continue;
+
+        let min = Infinity;
+        for (let k = 0; k < Scale.SCALES.length; k++) {
+          const cost =
+            table[i - 1][k] + Scale.SCALES[j].difference(Scale.SCALES[k]);
+
+          if (cost < min) {
+            min = cost;
+            backtrace[i][j] = [k];
+          } else if (cost === min) backtrace[i][j].push(k);
+        }
+
+        table[i][j] = min;
+      }
+    }
+
+    function pushScales(i: number, j: number) {
+      if (!scales[i].includes(Scale.SCALES[j])) scales[i].push(Scale.SCALES[j]);
+      if (i === 0) return;
+      for (const k of backtrace[i][j]) pushScales(i - 1, k);
+    }
+
+    const min = Math.min(...table[chords.length - 1]);
+    for (const i in scales) scales[i] = [];
+    for (let j = 0; j < Scale.SCALES.length; j++)
+      if (table[chords.length - 1][j] === min) pushScales(chords.length - 1, j);
+
+    setScales([...scales]);
   }, [chords]);
 
   return (

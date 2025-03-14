@@ -1,7 +1,7 @@
 import Note from "./Note";
 
 export default class Chord {
-  static extensions: { [token: string]: { [degree: number]: number } } = {
+  static EXTENSIONS: { [token: string]: { [degree: number]: number } } = {
     "6": { 6: 9 },
     "7": { 7: 10 },
     "9": { 7: 10, 9: 2 },
@@ -13,7 +13,7 @@ export default class Chord {
     M13: { 7: 11, 9: 2, 11: 5, 13: 9 },
   };
 
-  static alterations: { [token: string]: { degree: number; note: number } } = {
+  static ALTERATIONS: { [token: string]: { degree: number; note: number } } = {
     "♭5": { degree: 5, note: 6 },
     "♯5": { degree: 5, note: 8 },
     "♭9": { degree: 9, note: 1 },
@@ -45,7 +45,7 @@ export default class Chord {
     this.name = name;
     this.notes = {};
 
-    [this.notes[1], name] = Chord.parseToken<number>(name, Note.byName);
+    [this.notes[1], name] = Chord.parseToken<number>(name, Note.BY_NAME);
     if (this.notes[1] === undefined) {
       console.error(`Malformed chord "${this.name}": invalid root`);
       return;
@@ -63,7 +63,7 @@ export default class Chord {
     let extensions;
     [extensions, name] = Chord.parseToken<{ [degree: number]: number }>(
       name,
-      Chord.extensions
+      Chord.EXTENSIONS
     );
     if (extensions !== undefined)
       for (const degree in extensions)
@@ -73,7 +73,7 @@ export default class Chord {
     while (
       ([alteration, name] = Chord.parseToken<{ degree: number; note: number }>(
         name,
-        Chord.alterations
+        Chord.ALTERATIONS
       ))[0] !== undefined
     )
       this.notes[alteration!.degree] = this.notes[1] + alteration!.note;

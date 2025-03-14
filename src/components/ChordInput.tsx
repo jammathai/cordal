@@ -15,7 +15,7 @@ export default function ChordInput({
 >) {
   return (
     <div>
-      <div className="mt-2 mb-1 pl-1 h-12 text-primary text-xs border-primary border-b-2">
+      <div className="mt-2 mb-1 pl-1 h-4 text-primary text-xs border-primary border-b-2">
         {scales.map((scale) => scale.name).join(" | ")}
       </div>
       <FlexInput

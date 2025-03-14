@@ -1,5 +1,5 @@
 export default class Note {
-  static byName: { [token: string]: number } = {
+  static BY_NAME: { [token: string]: number } = {
     C: 0,
     "C♯": 1,
     "D♭": 1,
@@ -19,7 +19,7 @@ export default class Note {
     B: 11,
   };
 
-  static byValue = [
+  static BY_VALUE = [
     "C",
     "C♯/D♭",
     "D",
