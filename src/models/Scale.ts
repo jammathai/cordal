@@ -3,8 +3,8 @@ import Note from "./Note";
 
 export default class Scale {
   static TYPES: { [name: string]: number[] } = {
-    "maj.": [0, 2, 4, 5, 7, 9, 11],
-    "harm. min.": [0, 2, 3, 5, 7, 8, 11],
+    major: [0, 2, 4, 5, 7, 9, 11],
+    "harmonic minor": [0, 2, 3, 5, 7, 8, 11],
   };
 
   static SCALES = Note.BY_VALUE.flatMap((_, root) =>

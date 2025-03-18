@@ -1,6 +1,36 @@
 import Scale from "@/models/Scale";
 import FlexInput from "./FlexInput";
 
+const TEXT_COLORS = [
+  "text-red-900",
+  "text-blue-900",
+  "text-yellow-900",
+  "text-violet-900",
+  "text-green-900",
+  "text-pink-900",
+  "text-cyan-900",
+  "text-orange-900",
+  "text-indigo-900",
+  "text-lime-900",
+  "text-fuchsia-900",
+  "text-teal-900",
+];
+
+const BORDER_COLORS = [
+  "border-red-900",
+  "border-blue-900",
+  "border-yellow-900",
+  "border-violet-900",
+  "border-green-900",
+  "border-pink-900",
+  "border-cyan-900",
+  "border-orange-900",
+  "border-indigo-900",
+  "border-lime-900",
+  "border-fuchsia-900",
+  "border-teal-900",
+];
+
 export default function ChordInput({
   defaultValue,
   scales,
@@ -15,9 +45,6 @@ export default function ChordInput({
 >) {
   return (
     <div>
-      <div className="mt-2 mb-1 pl-1 h-4 text-primary text-xs border-primary border-b-2">
-        {scales.map((scale) => scale.name).join(" | ")}
-      </div>
       <FlexInput
         className="w-0 p-1 rounded-md bg-transparent placeholder-placeholder"
         defaultValue={defaultValue}
@@ -31,6 +58,15 @@ export default function ChordInput({
         }}
         {...props}
       />
+      {scales.map((scale) => (
+        <div
+          className={`pl-1 ${TEXT_COLORS[scale.notes[0]]} text-sm ${
+            BORDER_COLORS[scale.notes[0]]
+          } border-t-2`}
+        >
+          {scale.name}
+        </div>
+      ))}
     </div>
   );
 }
